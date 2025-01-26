@@ -9,14 +9,37 @@ using namespace std;
 
 // Convert rvalue to lvalue for simpler test harness code
 template <typename T>
-std::vector<T>& INL(std::initializer_list<T> list) {
-    static std::vector<T> vec(list);
+std::vector<T>& INL(std::initializer_list<T> list) 
+{
+    static std::vector<T> vec;
+    vec.assign(list);
+    return vec;
+}
+
+template <typename T>
+std::vector<T>& INL(std::vector<T> && v) 
+{
+    static std::vector<T> vec;
+    vec.assign(v);
+    return vec;
+}
+
+// Specialization for { const char*, ... } to vec<string>
+std::vector<std::string>& INL(std::initializer_list<const char*> list)
+{
+    static std::vector<std::string> vec;
+    vec.clear();
+    for (const auto& x : list)
+    {
+        vec.emplace_back(x);
+    }
     return vec;
 }
 
 // Output stream for common types
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) 
+{
     os << "[ ";
     for (size_t i = 0; i < vec.size(); ++i) {
         os << vec[i];
@@ -27,6 +50,4 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& vec) {
     os << " ]";
     return os;
 }
-
-
 
